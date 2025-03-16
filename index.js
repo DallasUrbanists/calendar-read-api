@@ -5,12 +5,10 @@ const PORT = process.env.PORT || 3000;
 // Middleware to parse JSON
 app.use(express.json());
 
-// Sample API endpoint
 app.get("/", (req, res) => {
     res.json({ message: "Hello, world! Your API is running." });
 });
 
-// Another sample route
 app.get("/api/data", (req, res) => {
     res.json({ data: "Here is some sample data!" });
 });
@@ -18,7 +16,7 @@ app.get("/api/data", (req, res) => {
 app.get("/api/duck", (req, res) => {
   res.json({
     bird: "Duck",
-    message: "Quack quack! I'm a duck!"
+    message: "Quack quack! I'm just a friendly duck!"
   });
 });
 
