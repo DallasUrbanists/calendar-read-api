@@ -15,6 +15,20 @@ app.get("/api/data", (req, res) => {
     res.json({ data: "Here is some sample data!" });
 });
 
+app.get("/api/duck", (req, res) => {
+  res.json({
+    bird: "Duck",
+    message: "Quack quack! I'm a duck!"
+  });
+});
+
+app.get("/api/goose", (req, res) => {
+  res.json({
+    bird: "Goose",
+    message: "Honk honk! I'm a goose!"
+  });
+});
+
 // Start the server
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
