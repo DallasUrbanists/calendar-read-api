@@ -20,6 +20,7 @@ class ActionNetworkEventScraper extends EventScraper {
   async fetchEventList() {
     const html = await this.fetchHTML(this.mainUrl);
     if (!html) return;
+    if (html.includes('CAPTCHA check')) return captchaAbort([]);
 
     const $ = cheerio.load(html);
     const extractEventElement = (string) => string.trim().replace("group_public_action_list_array.push({ li_wrapper: '", "").replace("',", "");
@@ -38,6 +39,7 @@ class ActionNetworkEventScraper extends EventScraper {
   async fetchEventDetails(eventObject) {
     const html = await this.fetchHTML(eventObject.link);
     if (!html) return eventObject;
+    if (html.includes('CAPTCHA check')) return captchaAbort(eventObject);
     const $ = cheerio.load(html);
     const datetime = $('.event_info .event_date .js-event_datetime').attr('title');
     const eventMoment = this.convertDatetimeStringToMoment(datetime);
@@ -61,5 +63,11 @@ class ActionNetworkEventScraper extends EventScraper {
     return moment(`${datePart} ${timePart}`, "dddd, MMMM D, YYYY h:mm A", "America/Chicago");
   };
 }
+
+function captchaAbort(fallback) {
+  console.log('CAPTCHA check triggered. Aborting.');
+  return fallback;
+}
+
 
 module.exports = ActionNetworkEventScraper;

@@ -25,8 +25,8 @@ class EventScraper {
     if (!cachedData) {
       return await useNewData('No cached data found for this URL.');
     }
-    if (cachedData.cacheTimestamp && cachedData.cacheTimestamp > moment().subtract(1, 'hour').unix()) {
-      return useCachedData(`Cached data is less than an hour old: ${moment.unix(cachedData.cacheTimestamp).fromNow()}.`);
+    if (cachedData.cacheTimestamp && cachedData.cacheTimestamp > moment().subtract(4, 'hour').unix()) {
+      return useCachedData(`Cached data is less than four hours old: ${moment.unix(cachedData.cacheTimestamp).fromNow()}.`);
     }
 
     const headers = await this.getPageHeaders(url);
@@ -68,7 +68,10 @@ class EventScraper {
   // Fetch and cache new content
   async updateCache(url) {
     try {
+      console.log(`Begin fetching ${url}...`);
       const response = await axios.get(url, HEADERS);
+      console.log(`Finished fetching ${url}.`);
+
       const headers = response.headers;
       const html = response.data;
       const lastModified = headers['last-modified'] || null;
@@ -90,6 +93,12 @@ class EventScraper {
     const cacheTimestamp = moment().unix();
     cache[url] = { html, lastModified, etag, cacheTimestamp };
     await fs.writeJson(CACHE_FILE, cache, { spaces: 2 });
+  }
+
+  waitRandomSeconds(minSeconds, maxSeconds) {
+    const randomDelay = Math.floor(Math.random() * (maxSeconds - minSeconds + 1) + minSeconds) * 1000;
+    console.log(`Waiting ${randomDelay / 1000} seconds...`);
+    return new Promise(resolve => setTimeout(resolve, randomDelay));
   }
 }
 
