@@ -51,12 +51,14 @@ class TeamUpCalendar extends EventScraper {
   async postEvent(event) {
     const params = {
       start_dt: event.start_dt,
+      who: event.who ?? '',
       end_dt: event.end_dt,
       title: event.title,
       notes: event.notes,
       location: event.location,
       all_day: event.all_day ?? false,
       subcalendar_ids: [this.subcalendarId],
+      custom: event.custom ?? {},
     };
 
     console.log('Posting event:', params);

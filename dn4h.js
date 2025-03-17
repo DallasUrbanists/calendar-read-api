@@ -1,4 +1,5 @@
 require("dotenv").config();
+const os = require("os");
 const moment = require('moment');
 const ActionNetworkEventScraper = require('./ActionNetworkEventScraper.js');
 const TeamUpCalendar = require('./TeamUpCalendar.js');
@@ -47,10 +48,14 @@ async function main() {
  
   for (let actionEvent of eventsMissingFromTeamup) {
     const newTeamUpEvent = await teamup.postEvent({
+      who: 'Dallas Neighbors for Housing',
+      custom: {
+        signup_link: actionEvent.link
+      },
+      title: actionEvent.title,
       start_dt: actionEvent.startDate,
       end_dt: actionEvent.endDate,
-      title: actionEvent.title,
-      notes: actionEvent.description,
+      notes: actionEvent.link + os.EOL + actionEvent.description,
       location: actionEvent.location,
       all_day: actionEvent.allDay,
     });

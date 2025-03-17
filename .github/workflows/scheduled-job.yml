@@ -1,0 +1,25 @@
+name: Hourly Scheduled Job
+
+on:
+  schedule:
+    - cron: "33 6-20 * * *"  # Runs once per hour from 6 AM to 8 PM
+  workflow_dispatch:  # Allows manual triggering
+
+jobs:
+  run_script:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "18"
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: "Run the scheduled script: sync DN4H calendar"
+        run: npm run dn4h-sync
