@@ -6,9 +6,10 @@ const TeamUpCalendar = require('./TeamUpCalendar.js');
 /////////////////////////////////////////////////////
 /** Configuration for Dallas Neighbors for Housing */
 const actionNetworkUrl = 'https://actionnetwork.org/groups/dallas-neighbors-for-housing';
-const actionNetworkCacheTTL = 2;
+const actionNetworkCacheTTL = 2; // hours
 const teamupMainCalendarId = process.env.TEAMUP_DALLAS_URBANISTS_COMMUNITY_CALENDAR_MODIFIABLE_ID;
 const teamupSubcalendarId = '14173954';
+const teamupCacheTTL = 1; // hours
 const minWaitSeconds = process.env.MIN_WAIT_SECONDS ?? 2;
 const maxWaitSeconds = process.env.MAX_WAIT_SECONDS ?? 5;
 /////////////////////////////////////////////////////
@@ -16,6 +17,7 @@ const maxWaitSeconds = process.env.MAX_WAIT_SECONDS ?? 5;
 const actionNetwork = new ActionNetworkEventScraper(actionNetworkUrl);
 actionNetwork.ttl = actionNetworkCacheTTL;
 const teamup = new TeamUpCalendar(process.env.TEAMUP_APIKEY, teamupMainCalendarId, teamupSubcalendarId);
+teamup.ttl = teamupCacheTTL;
 
 async function main() {
   const logs = [];
@@ -24,11 +26,15 @@ async function main() {
   const eventsMissingFromTeamup = [];
   
   for (let actionEvent of actionEvents) {
-    await actionNetwork.waitRandomSeconds(minWaitSeconds, maxWaitSeconds);
+    if (await actionNetwork.needsToFetch(actionEvent)) {
+      await actionNetwork.waitRandomSeconds(minWaitSeconds, maxWaitSeconds);
+    } else {
+      log(`${actionEvent.title} already cached. No need to wait few seconds`);
+    }
     const eventDetails = await actionNetwork.fetchEventDetails(actionEvent);
     const eventIsSearchable = eventDetails.title && eventDetails.startDate;
-    const eventIsUpcoming = eventDetails.startDate && moment(eventDetails.startDate).isSameOrAfter(moment());
-    if (eventIsSearchable && eventIsUpcoming) {
+    const eventIsRecent = eventDetails.startDate && moment(eventDetails.startDate).isSameOrAfter(moment().subtract(3, 'months'));
+    if (eventIsSearchable && eventIsRecent) {
       if (null === await teamup.findEvent(eventDetails.title, eventDetails.startDate)) {
         log('Upcoming event listed on Action Network does not exist yet in TeamUp and needs to be created:', eventDetails.title);
         eventsMissingFromTeamup.push(eventDetails);
@@ -52,8 +58,6 @@ async function main() {
   }
 
   log('Sync finished.');
-  log('Events found from Action Network:', actionEvents);
-  log('Events missing from TeamUp:', eventsMissingFromTeamup);
 
   return logs;
 }

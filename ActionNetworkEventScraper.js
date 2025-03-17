@@ -1,6 +1,7 @@
 const EventScraper = require('./EventScraper.js');
 const cheerio = require('cheerio');
 const moment = require('moment');
+const parseToMoment = require('./parse-to-moment.js');
 
 const DOMAIN = 'https://actionnetwork.org';
 
@@ -13,6 +14,11 @@ class ActionNetworkEventScraper extends EventScraper {
     this.mainUrl = mainUrl;
   }
   
+  async needsToFetch(event) {
+    const cached = await this.getCachedData(event.link);
+    return cached === null;
+  }
+
   /**
   * Gets an array of event titles scraped from the Action Network web page.
   * @returns {Promise<Object>} - Returns a promise that resolves to an array of objects representing the events.
@@ -42,17 +48,27 @@ class ActionNetworkEventScraper extends EventScraper {
     if (html.includes('CAPTCHA check')) return captchaAbort(eventObject);
     try {
       const $ = cheerio.load(html);
-      const datetime = $('.event_info .event_date .js-event_datetime').attr('title');
-      const eventMoment = this.convertDatetimeStringToMoment(datetime);  
+      const dateElements = $('.event_date');
+
+      // Abort if we can't find at least one event date, 
+      if (dateElements.length === 0) return eventObject;
+
+      const startMoment = parseToMoment(dateElements.eq(0).text());
+      const endMoment = dateElements.length > 1
+        ? parseToMoment(dateElements.eq(1).text())
+        : startMoment.clone().add(1, 'hour');
+      const location = $('.event_location') ? $('.event_location').text().trim() : '';
+      const description = $('.action_description') ? $('.action_description').text().trim() : '';
+
       return {
         ...eventObject,
-        startDate: eventMoment.format('YYYY-MM-DDTHH:mm:ssZ'),
-        endDate: eventMoment.add(1, 'hours').format('YYYY-MM-DDTHH:mm:ssZ'),
-        location: $('.event_info .event_location').text().trim(),
-        description: $('.action_description').text().trim()
+        startDate: startMoment.format('YYYY-MM-DDTHH:mm:ssZ'),
+        endDate: endMoment.format('YYYY-MM-DDTHH:mm:ssZ'),
+        location: location,
+        description: description
       };
     } catch (e) {
-      console.log('Failed to parse details for this event from Action Network:', eventObject);
+      console.log('Failed to parse details for this event from Action Network:', e);
       return eventObject;
     }
   }

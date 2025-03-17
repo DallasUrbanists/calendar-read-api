@@ -9,27 +9,23 @@ const dn4h = require('./dn4h.js');
 app.use(express.json());
 
 app.get("/", (req, res) => {
-  res.json({ message: "Hello, world! Your API is running." });
-});
-
-app.get("/test", (req, res) => {
-  const teamupMainCalendarId = process.env.TEAMUP_DALLAS_URBANISTS_COMMUNITY_CALENDAR_MODIFIABLE_ID;
-  const teamupSubcalendarId = '14173954';
-  const minWaitSeconds = process.env.MIN_WAIT_SECONDS ?? 2;
-  const maxWaitSeconds = process.env.MAX_WAIT_SECONDS ?? 5;
-  const teamupApiKey = process.env.TEAMUP_APIKEY;
   res.json({
-    teamupMainCalendarId,
-    teamupSubcalendarId,
-    minWaitSeconds,
-    maxWaitSeconds,
-    teamupApiKey
-  })  
+    message: "Hello! You found my calendar event scraper. I builts this web service toHey there! You’ve found my calendar event scraper. I built this to keep the Dallas Urbanists Community Calendar updated automatically. Every few hours, a script grabs events from local organizations and adds them to the calendar.",
+    links: [
+      {
+        label: 'Dallas Urbanists Community Calendar on Teamup',
+        url: 'https://teamup.com/kszxfmof4iyibgp1kn'
+      },
+      {
+        label: 'Github',
+        url: 'https://github.com/DallasUrbanists/calendar-read-api'
+      },
+    ]
+  });
 });
 
 app.get("/api/dn4h/sync", (req, res) => {
   dn4h().then(result => {
-    console.log('API results:', result);
     res.json(result);
   });
 });

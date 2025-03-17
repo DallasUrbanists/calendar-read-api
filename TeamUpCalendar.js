@@ -24,10 +24,12 @@ class TeamUpCalendar extends EventScraper {
 
   async fetchEvents() { 
     if (!this.fetchedEvents) {
-      const fetchURL = this.calendarUrl([
-        `startDate=${moment().subtract(1, 'days').format('YYYY-MM-DD')}`,
+      // Look for upcoming events up to 3 months ago and 1 year in future
+      const fetchDateRange = [
+        `startDate=${moment().subtract(3, 'months').format('YYYY-MM-DD')}`,
         `endDate=${moment().add(1, 'years').format('YYYY-MM-DD')}`,
-      ]);
+      ];
+      const fetchURL = this.calendarUrl(fetchDateRange);
       const fetchResult = await this.fetchURL(fetchURL, { events: [] });
       this.fetchedEvents = fetchResult.events;
       this.fetchedUrl = fetchURL;
@@ -67,9 +69,6 @@ class TeamUpCalendar extends EventScraper {
     });
     const newEvent = postResponse.data.event;
     const allEvents = await this.fetchEvents();
-    console.log('All events before push:', allEvents);
-    allEvents.push(newEvent);
-    console.log('All events after push:', allEvents);
     this.saveCache(this.fetchedUrl, { events: allEvents });
 
     return newEvent;

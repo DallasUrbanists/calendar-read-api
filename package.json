@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dn4h-sync": "run-func dn4h.js main"
   },
   "keywords": [],
   "author": "",
@@ -16,6 +17,7 @@
     "express.js": "^1.0.0",
     "fs-extra": "^11.3.0",
     "moment": "^2.30.1",
-    "moment-timezone": "^0.5.47"
+    "moment-timezone": "^0.5.47",
+    "run-func": "^3.0.0"
   }
 }
