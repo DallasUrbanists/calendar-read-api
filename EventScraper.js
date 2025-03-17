@@ -10,17 +10,18 @@ class EventScraper {
   /**
   * Fetches the rawResponse content of a webpage.
   * @param {string} url - The URL of the webpage to fetch.
+  * @param {any} fallback - The value to use if the URL cannot be fetched.
   * @returns {Promise<string>} - Returns a promise that resolves to the rawResponse content of the webpage.
   */
-  async fetchURL(url) {
+  async fetchURL(url, fallback = null) {
     const cachedData = await this.getCachedData(url);
     const useCachedData = message => {
       console.log(message + ' Using cached content.');
-      return cachedData.rawResponse;
+      return cachedData.rawResponse ?? fallback;
     };
     const useNewData = message => {
       console.log(message + ' Fetching new content...');
-      return this.updateCache(url);
+      return this.updateCache(url) ?? fallback;
     };
     
     if (!cachedData) {
