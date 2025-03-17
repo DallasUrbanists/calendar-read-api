@@ -46,41 +46,7 @@ const trial = `<div id="our_actions" class="js-our_actions">
 		group_public_action_list_array.push({ li_wrapper: '<a href="https://actionnetwork.org/forms/join-us-for-dallass-point-in-time-count"><img src="https://can2-prod.s3.amazonaws.com/forms/photos/000/504/669/thumb/signal-2022-02-06-143207_001.png" class="our_single_image js-our_single_image" /></a><h6><a href="https://actionnetwork.org/forms/join-us-for-dallass-point-in-time-count" class="listjs_name">Join us for the Dallas Point in Time Count</a></h6>' });
 		group_public_action_list_array.push({ li_wrapper: '<a href="https://actionnetwork.org/forms/join-dallas-neighbors-for-housing"><img src="/images/default_action.jpg" class="our_single_image js-our_single_image" /></a><h6><a href="https://actionnetwork.org/forms/join-dallas-neighbors-for-housing" class="listjs_name">Follow Dallas Neighbors for Housing</a></h6>' });
 	</script>
-</div>`
-
-async function fetchHTML(url) {
-    try {
-        const { data } = await axios.get(url, {
-            headers: { 'User-Agent': 'Mozilla/5.0' } // Prevents blocking by some websites
-        });
-        return data;
-    } catch (error) {
-        console.error(`Error fetching the webpage: ${error.message}`);
-        return null;
-    }
-}
-
-async function extractContent(url) {
-    //const html = await fetchHTML(url);
-    const html = trial;
-    if (!html) return;
-
-    const $ = cheerio.load(html);
-
-    const actions = $('#our_actions script').html().split(/\r?\n/).filter(line=>line.includes('https://actionnetwork.org')).map(line => {
-      const $ = cheerio.load(line.trim()
-        .replace("group_public_action_list_array.push({ li_wrapper: '", "")
-        .replace("' });", "")
-      );
-      return {
-        link: $('a').attr('href'),
-        img: $('img').attr('src'),
-        title: $('a').text()
-      };
-    });
-
-    console.log('Script:', actions);
-}
+</div>`;
 
 const EXTRACT_SAMPLE = `<div class="event_info view_event_info js-event_info">
   <div class="event_info_inner clearfi">
@@ -101,6 +67,40 @@ const EXTRACT_SAMPLE = `<div class="event_info view_event_info js-event_info">
   </div>
 </div>`;
 
+
+async function fetchHTML(url) {
+    try {
+        const { data } = await axios.get(url, {
+            headers: { 'User-Agent': 'Mozilla/5.0' } // Prevents blocking by some websites
+        });
+        return data;
+    } catch (error) {
+        console.error(`Error fetching the webpage: ${error.message}`);
+        return null;
+    }
+}
+
+async function extractContent(url) {
+    const html = await fetchHTML(url);
+    if (!html) return;
+
+    const $ = cheerio.load(html);
+
+    const actions = $('#our_actions script').html().split(/\r?\n/).filter(line=>line.includes('https://actionnetwork.org')).map(line => {
+      const $ = cheerio.load(line.trim()
+        .replace("group_public_action_list_array.push({ li_wrapper: '", "")
+        .replace("' });", "")
+      );
+      return {
+        link: $('a').attr('href'),
+        img: $('img').attr('src'),
+        title: $('a').text()
+      };
+    });
+
+    console.log('Script:', actions);
+}
+
 async function extractEventDetails(url) {
   const $ = cheerio.load(EXTRACT_SAMPLE);
   const dateTimeElement = $('.event_info .event_date .js-event_datetime');
@@ -115,5 +115,7 @@ async function extractEventDetails(url) {
 }
 
 const url = 'https://actionnetwork.org/groups/dallas-neighbors-for-housing'; // Replace with the URL you want to scrape
-//extractContent(url);
+
+
+
 console.log(extractEventDetails(url));
