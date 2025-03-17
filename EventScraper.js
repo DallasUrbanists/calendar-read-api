@@ -1,3 +1,4 @@
+require("dotenv").config();
 const axios = require('axios');
 const fs = require('fs-extra');
 const moment = require('moment');
@@ -6,6 +7,7 @@ const CACHE_FILE = 'EventScraper.cache.json';
 class EventScraper {
   constructor(headers) {
     this.headers = headers;
+    this.ttl = process.env.DEFAULT_CACHE_TTL ?? 4;
   }
   /**
   * Fetches the rawResponse content of a webpage.
@@ -27,8 +29,8 @@ class EventScraper {
     if (!cachedData) {
       return await useNewData('No cached data found for this URL.');
     }
-    if (cachedData.cacheTimestamp && cachedData.cacheTimestamp > moment().subtract(4, 'hour').unix()) {
-      return useCachedData(`Cached data is less than four hours old: ${moment.unix(cachedData.cacheTimestamp).fromNow()}.`);
+    if (cachedData.cacheTimestamp && cachedData.cacheTimestamp > moment().subtract(this.ttl, 'hour').unix()) {
+      return useCachedData(`Cached data is less than ${this.ttl} hours old: ${moment.unix(cachedData.cacheTimestamp).fromNow()}.`);
     }
 
     const headers = await this.getPageHeaders(url);

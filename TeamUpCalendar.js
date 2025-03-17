@@ -25,8 +25,8 @@ class TeamUpCalendar extends EventScraper {
   async fetchEvents() { 
     if (!this.fetchedEvents) {
       const fetchURL = this.calendarUrl([
-        'startDate=2020-01-01',
-        'endDate=2026-12-31',
+        `startDate=${moment().subtract(1, 'days').format('YYYY-MM-DD')}`,
+        `endDate=${moment().add(1, 'years').format('YYYY-MM-DD')}`,
       ]);
       const fetchResult = await this.fetchURL(fetchURL, { events: [] });
       this.fetchedEvents = fetchResult.events;

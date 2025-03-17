@@ -40,17 +40,21 @@ class ActionNetworkEventScraper extends EventScraper {
     const html = await this.fetchURL(eventObject.link);
     if (!html) return eventObject;
     if (html.includes('CAPTCHA check')) return captchaAbort(eventObject);
-    const $ = cheerio.load(html);
-    const datetime = $('.event_info .event_date .js-event_datetime').attr('title');
-    const eventMoment = this.convertDatetimeStringToMoment(datetime);
-
-    return {
-      ...eventObject,
-      startDate: eventMoment.format('YYYY-MM-DDTHH:mm:ssZ'),
-      endDate: eventMoment.add(1, 'hours').format('YYYY-MM-DDTHH:mm:ssZ'),
-      location: $('.event_info .event_location').text().trim(),
-      description: $('.action_description').text().trim()
-    };
+    try {
+      const $ = cheerio.load(html);
+      const datetime = $('.event_info .event_date .js-event_datetime').attr('title');
+      const eventMoment = this.convertDatetimeStringToMoment(datetime);  
+      return {
+        ...eventObject,
+        startDate: eventMoment.format('YYYY-MM-DDTHH:mm:ssZ'),
+        endDate: eventMoment.add(1, 'hours').format('YYYY-MM-DDTHH:mm:ssZ'),
+        location: $('.event_info .event_location').text().trim(),
+        description: $('.action_description').text().trim()
+      };
+    } catch (e) {
+      console.log('Failed to parse details for this event from Action Network:', eventObject);
+      return eventObject;
+    }
   }
 
   convertDatetimeStringToMoment(datetimeString) {
@@ -68,6 +72,5 @@ function captchaAbort(fallback) {
   console.log('CAPTCHA check triggered. Aborting.');
   return fallback;
 }
-
 
 module.exports = ActionNetworkEventScraper;
