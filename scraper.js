@@ -68,7 +68,7 @@ const EXTRACT_SAMPLE = `<div class="event_info view_event_info js-event_info">
 </div>`;
 
 
-async function fetchHTML(url) {
+async function fetchURL(url) {
     try {
         const { data } = await axios.get(url, {
             headers: { 'User-Agent': 'Mozilla/5.0' } // Prevents blocking by some websites
@@ -81,7 +81,7 @@ async function fetchHTML(url) {
 }
 
 async function extractContent(url) {
-    const html = await fetchHTML(url);
+    const html = await fetchURL(url);
     if (!html) return;
 
     const $ = cheerio.load(html);

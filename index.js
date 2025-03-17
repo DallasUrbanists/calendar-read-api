@@ -24,7 +24,7 @@ app.get("/api/duck", (req, res) => {
 app.get("/api/goose", (req, res) => {
   const scraper = new EventScraper();
   const url = 'https://dallasurbanists.com';
-  scraper.fetchHTML(url).then(async html => {
+  scraper.fetchURL(url).then(async html => {
     res.json({
       bird: "Goose",
       message: "Honk honk! I'm a goose!",

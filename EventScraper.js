@@ -2,20 +2,21 @@ const axios = require('axios');
 const fs = require('fs-extra');
 const moment = require('moment');
 
-const USER_AGENT = { 'User-Agent': 'Mozilla/5.0' }; // Prevents blocking by some websites
-const HEADERS = { headers: USER_AGENT };
 const CACHE_FILE = 'EventScraper.cache.json';
 class EventScraper {
+  constructor(headers) {
+    this.headers = headers;
+  }
   /**
-  * Fetches the HTML content of a webpage.
+  * Fetches the rawResponse content of a webpage.
   * @param {string} url - The URL of the webpage to fetch.
-  * @returns {Promise<string>} - Returns a promise that resolves to the HTML content of the webpage.
+  * @returns {Promise<string>} - Returns a promise that resolves to the rawResponse content of the webpage.
   */
-  async fetchHTML(url) {
+  async fetchURL(url) {
     const cachedData = await this.getCachedData(url);
     const useCachedData = message => {
       console.log(message + ' Using cached content.');
-      return cachedData.html;
+      return cachedData.rawResponse;
     };
     const useNewData = message => {
       console.log(message + ' Fetching new content...');
@@ -51,7 +52,7 @@ class EventScraper {
   // Function to get headers from a `HEAD` request
   async getPageHeaders(url) {
     try {
-      const response = await axios.head(url, HEADERS);
+      const response = await axios.head(url, { headers: this.headers });
       return response.headers;
     } catch (error) {
       return errorResponse('Error fetching headers', error);
@@ -69,29 +70,29 @@ class EventScraper {
   async updateCache(url) {
     try {
       console.log(`Begin fetching ${url}...`);
-      const response = await axios.get(url, HEADERS);
+      const response = await axios.get(url, {headers: this.headers});
       console.log(`Finished fetching ${url}.`);
 
       const headers = response.headers;
-      const html = response.data;
+      const rawResponse = response.data;
       const lastModified = headers['last-modified'] || null;
       const etag = headers['etag'] || null;
       
-      await this.saveCache(url, html, lastModified, etag);
-      return html;
+      await this.saveCache(url, rawResponse, lastModified, etag);
+      return rawResponse;
     } catch (error) {
       return errorResponse('Error fetching headers', error);
     }
   }
   
   // Save new data to cache
-  async saveCache(url, html, lastModified, etag) {
+  async saveCache(url, rawResponse, lastModified, etag) {
     let cache = {};
     if (fs.existsSync(CACHE_FILE)) {
       cache = await fs.readJson(CACHE_FILE);
     }
     const cacheTimestamp = moment().unix();
-    cache[url] = { html, lastModified, etag, cacheTimestamp };
+    cache[url] = { rawResponse, lastModified, etag, cacheTimestamp };
     await fs.writeJson(CACHE_FILE, cache, { spaces: 2 });
   }
 

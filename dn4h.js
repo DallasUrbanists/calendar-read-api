@@ -11,10 +11,12 @@ const teamup = new TeamUpCalendar(
   '14173954'
 );
 
-actionNetwork.fetchEventList().then(async (actionEvents) => {
+teamup.fetchEvents().then(console.log);
+
+/*actionNetwork.fetchEventList().then(async (actionEvents) => {
   for (let event of actionEvents) {
     await actionNetwork.waitRandomSeconds(2, 4);
     const eventDetails = await actionNetwork.fetchEventDetails(event);
     console.log(eventDetails);
   }
-});
+});*/

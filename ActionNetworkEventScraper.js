@@ -9,7 +9,7 @@ class ActionNetworkEventScraper extends EventScraper {
    * @param {string} mainUrl - The URL of the Action Network web page to scrape.
    */
   constructor(mainUrl) {
-    super();
+    super({ 'User-Agent': 'Mozilla/5.0' }); // Prevents blocking by some websites
     this.mainUrl = mainUrl;
   }
   
@@ -18,7 +18,7 @@ class ActionNetworkEventScraper extends EventScraper {
   * @returns {Promise<Object>} - Returns a promise that resolves to an array of objects representing the events.
   */
   async fetchEventList() {
-    const html = await this.fetchHTML(this.mainUrl);
+    const html = await this.fetchURL(this.mainUrl);
     if (!html) return;
     if (html.includes('CAPTCHA check')) return captchaAbort([]);
 
@@ -37,7 +37,7 @@ class ActionNetworkEventScraper extends EventScraper {
   };
 
   async fetchEventDetails(eventObject) {
-    const html = await this.fetchHTML(eventObject.link);
+    const html = await this.fetchURL(eventObject.link);
     if (!html) return eventObject;
     if (html.includes('CAPTCHA check')) return captchaAbort(eventObject);
     const $ = cheerio.load(html);
