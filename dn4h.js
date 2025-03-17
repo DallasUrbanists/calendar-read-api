@@ -17,11 +17,13 @@ const sampleEvent = {
   title: 'Housing Bills at the Texas Legislature'
 };
 
-actionNetwork.fetchEventDetails(sampleEvent).then(event => {
-  console.log(event);
+actionNetwork.fetchEventList().then(actionEvents => {
+  console.log(actionEvents);
+  /*actionEvents.forEach(async event => {
+    const actionEvent = await actionNetwork.fetchEventDetails(event);
+    console.log(actionEvent);
+  });*/
 });
-
-
 
 
 /*actionNetwork.fetchEventList().then(actionEvents => {

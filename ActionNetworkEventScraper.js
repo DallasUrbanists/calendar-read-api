@@ -20,6 +20,7 @@ class ActionNetworkEventScraper extends EventScraper {
   async fetchEventList() {
     const html = await this.fetchHTML(this.mainUrl);
     if (!html) return;
+
     const $ = cheerio.load(html);
     const extractEventElement = (string) => string.trim().replace("group_public_action_list_array.push({ li_wrapper: '", "").replace("',", "");
     const eventElements = $('#our_actions script').html().split(/\r?\n/).filter(line=>line.includes(DOMAIN)).map(extractEventElement);
