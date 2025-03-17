@@ -1,6 +1,7 @@
 const express = require("express");
 const app = express();
 const PORT = process.env.PORT || 3000;
+const EventScraper = require("./EventScraper");
 
 // Middleware to parse JSON
 app.use(express.json());
@@ -21,9 +22,15 @@ app.get("/api/duck", (req, res) => {
 });
 
 app.get("/api/goose", (req, res) => {
-  res.json({
-    bird: "Goose",
-    message: "Honk honk! I'm a goose!"
+  const scraper = new EventScraper();
+  const url = 'https://dallasurbanists.com';
+  scraper.fetchHTML(url).then(async html => {
+    res.json({
+      bird: "Goose",
+      message: "Honk honk! I'm a goose!",
+      html,
+      cache: await scraper.getCachedData(url)
+    });
   });
 });
 
