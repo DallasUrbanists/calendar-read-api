@@ -12,6 +12,8 @@ class TeamUpCalendar extends EventScraper {
     });
     this.calendarId = calendarId;
     this.subcalendarId = subcalendarId;
+    this.startSearchDate = moment().subtract(3, 'months').format('YYYY-MM-DD');
+    this.endSearchDate = moment().add(1, 'years').format('YYYY-MM-DD');
   }
 
   calendarUrl(params = [], useSubcalendarId = true) {
@@ -22,12 +24,12 @@ class TeamUpCalendar extends EventScraper {
     return `${baseUrl}/events?${params.join('&')}`;
   }
 
-  async fetchEvents() { 
+  async fetchEvents(limitDateRange=true) { 
     if (!this.fetchedEvents) {
-      // Look for upcoming events up to 3 months ago and 1 year in future
+      // Look for events within search range
       const fetchDateRange = [
-        `startDate=${moment().subtract(3, 'months').format('YYYY-MM-DD')}`,
-        `endDate=${moment().add(1, 'years').format('YYYY-MM-DD')}`,
+        `startDate=${this.startSearchDate}`,
+        `endDate=${this.endSearchDate}`,
       ];
       const fetchURL = this.calendarUrl(fetchDateRange);
       const fetchResult = await this.fetchURL(fetchURL, { events: [] });
@@ -50,6 +52,7 @@ class TeamUpCalendar extends EventScraper {
 
   async postEvent(event) {
     const params = {
+      remote_id: event.remote_id ?? null,
       start_dt: event.start_dt,
       who: event.who ?? '',
       end_dt: event.end_dt,
