@@ -64,8 +64,6 @@ class TeamUpCalendar extends EventScraper {
       custom: event.custom ?? {},
     };
 
-    console.log('Posting event:', params);
-
     const postResponse = await axios.request({
       method: 'post',
       url: this.calendarUrl([], false),

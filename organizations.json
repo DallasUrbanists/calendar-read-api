@@ -1,0 +1,50 @@
+[
+    {
+        "name": "Dallas Urbanists STLC",
+        "aliases": ["Dallas Urbanists", "STLC", "DallasUrbanistsSTLC", "Dallas Urbanists Strong Towns Local Converation", "DUSTLC", "DU Strong Towns Local Converation", "Dallas Strong Towns", "Dallas Strong Towns Local Conversation", "Strong Towns Dallas"]
+    },
+    {
+        "name": "Dallas Neighbors for Housing",
+        "aliases": ["DN4H", "Neighbors for Housing", "NeighborsDTX", "Neighbors Dallas"]
+    },
+    {
+        "name": "Dallas Bicycle Coalition",
+        "aliases": ["DBC", "Dallas Bike Coalition", "Bicycle Coalition", "Bike Coalition"]
+    },
+    {
+        "name": "Dallas Housing Coalition",
+        "aliases": ["DHC", "Housing Coalition"]
+    },
+    {
+        "name": "Dallas Area Transit Alliance",
+        "aliases": ["DATA", "Transit Alliance"]
+    },
+    {
+        "name": "Urbanistas DFW",
+        "aliases": ["DFW Urbanistas", "Urbanistas", "Ladies for Equitable Transit", "Women for Equitable Transit"]
+    },
+    {
+        "name": "Better Block",
+        "aliases": ["BB", "Better Block Foundation", "The Better Block Foundation"]
+    },
+    {
+        "name": "Greater Dallas Planning Council",
+        "aliases": ["GDPC"]
+    },
+    {
+        "name": "Congress for New Urbanism North Texas",
+        "aliases": ["CNUNTX", "CNU NTX", "CNU North Texas", "Congress for New Urbanism NTX"]
+    },
+    {
+        "name": "DART",
+        "aliases": ["Dallas Area Rapid Transit"]
+    },
+    {
+        "name": "Trinity Metro",
+        "aliases": ["The T"]
+    },
+    {
+        "name": "DCTA",
+        "aliases": ["Denton County Transit Authority"]
+    }
+]

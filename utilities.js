@@ -1,3 +1,5 @@
+const _ = require('lodash');
+
 /**
  * Calculates the similarity percentage between two strings using the Levenshtein Distance algorithm.
  * 
@@ -44,6 +46,61 @@ function getSimilarityPercentage(str1, str2) {
   return 1 - distance / maxLength;
 }
 
+function fuzzyMatch(str1, str2) {
+  const normalize = str => _.toUpper(str.trim().replace(/[^a-zA-Z0-9 ]/g, '').replace(/\s+/g, ' '));
+  const similarity = getSimilarityPercentage(normalize(str1), normalize(str2));
+
+  return similarity > 0.8;
+}
+
+/**
+ * Checks if a given location string is an alias for Dallas, TX.
+ * Uses fuzzy matching to accommodate minor misspellings.
+ * 
+ * @param {string} location - The location string to check.
+ * @returns {boolean} - True if the location is an alias of "Dallas, TX", false otherwise.
+ */
+function isJustDallas(string) {
+  const aliases = [
+    'DTX',
+    'DALLAS',
+    'DALLAS, TX',
+    'DALLASTX',
+    'DALLAS TEXAS',
+    'DALLASTEXAS',
+    'DAL'
+  ];
+  for (let alias of aliases) {
+    if (fuzzyMatch(alias, string)) {
+      return true;
+    }
+  }
+  return false;
+}
+
+/**
+ * Extracts all text inside square brackets from a given string.
+ * @param {string} inputString - The input string containing text in brackets.
+ * @returns {Array} - An array of extracted strings from the brackets.
+ */
+function parseBrackets(inputString) {
+  const matches = inputString.match(/\[([^\]]+)\]/g);
+  return matches ? matches.map(match => match.slice(1, -1)) : [];
+}
+
+/**
+ * Removes square brackets and the text within them from a given string.
+ * @param {string} inputString - The input string containing text in brackets.
+ * @returns {string} - The cleaned up string.
+ */
+function removeBrackets(inputString) {
+  return inputString.replace(/\[.*?\]\s*/g, '').trim();
+}
+
 module.exports = {
-  getSimilarityPercentage
+  getSimilarityPercentage,
+  fuzzyMatch,
+  isJustDallas,
+  parseBrackets,
+  removeBrackets
 };
