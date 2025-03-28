@@ -1,0 +1,176 @@
+what's next for DATA calendar?
+
+Event Properties:
+    Event IDs:
+        - Scrape ID: uniquely identifies the event as stored in the scraper web service
+        - Source ID: the unique identifier given to the event by its original source
+        - Teamup ID: the unique identifier given to the event by Teamup 
+    sourceTitle: string
+        The raw title of the event as scraped from the source and before normalization.
+    sourceOrganization: string
+        The organization from whom we've scraped this event
+    isCrosspost: boolean
+        Determines whether this event was cross-posted by the source org on behalf of another org
+        This also helps figure out which event comes from the original
+    References:
+        - canonSourceId: string|null (default: null)
+            This is the Source ID of another event that isn't a crosspost and has highest authority
+            Set to null when the canonical source is unknown
+        - siblingScrapeIds: Array<string>
+            These are all 
+    history:
+        creationDate: based on source and never changes once set
+        lastModified: based on source
+
+
+Merges:
+    this.fillDetailsFrom(otherEvent)
+     - Copy properties from otherEvent that are empty in this event.
+     - Appends hosts from otherEvent to this event, but keeps main host on this event untouched
+     - Properties that already had values in this event are unaffected
+     - Properties in otherEvent are untouched
+     - Typically used for adding detail missing in canon event with details from non-canon events
+    this.overwriteDetailsFrom(otherEvent)
+     - Replaces properties in this event with non-null details from otherEvent
+     - Merges hosts arrays and changes main host of this event to match main host of other event
+     - Properties with values in this event that are null in other event are untouched
+     - Properties in otherEvent are untouched
+     - Typically used for updating sibling details with canon details
+    this.crossFillWith(otherEvent)
+     - Calls `fillDetailsFrom()` on both events
+     - Execute this.fillDetailsFrom(otherEvent) first
+     - Execute otherEvent.fillDetailsFrom(this) second
+     - Typically used for filling siblings details when canon is not yet known
+    this.crossUpdateWith(otherEvent)
+     - First compares lastModified dates to get newer and older event. If lastModified same, assumes this event is older
+     - older.overwriteDetailsFrom(newer)
+     - newer.fillDetailsFrom(older)
+
+
+Sources/
+    interface SourceInterface
+    class DallasNeighborsForHousing implements SourceInterface
+    class DallasBicycleCoalition implements SourceInterface
+    class DallasAreaTransitAlliance implements SourceInterface
+    class DallasUrbanistsSTLC implements SourceInterface
+TeamUp/
+    class EventDTO
+    class TeamupAPI
+Channels/
+    interface ChannelInterface
+    class ActionNetwork implements ChannelInterface
+    class iCalendar implements ChannelInterface
+Storage/
+    interface StorageInterface
+    class ScrapedCalendar implements StorageInterface
+    class StagedCalendar implements StorageInterface
+    class TeamupCache implements StorageInterface
+
+
+organizations.ts
+utilities.ts
+index.ts
+
+
+
+    ScrapedCalendar.ts
+        all events pulled from sources. Contains both canon and non-canon events.
+    StagedCalendar.ts
+        events that need to be sent to TeamUp for synchronization
+    TeamupCache.ts
+        cached response from TeamUp.
+        Used for determining which events in Staged Calendar need PUT vs POST operation
+        Also used for detecting events that need to be deleted from TeamUp
+
+
+1. Pull all events from DATA ICS calendar
+    - Set the scape ID for all events pulled from ICS to be the "ics" + ICS.id
+    - Set the source ID for all events pulled from ICS to the ics.id
+
+2. Normalize all pulled events
+    - Set the event.title and event.sourceTitle equal to the title from ICS
+    - Add DATA as a host of the event
+    - Fix the event title and hosts array
+        1. Normalize the title
+            - IF there are title brackets
+                - THEN set the first bracket org as the primary host
+                - SET event.isCrosspost = true for this event
+        2. Normalize the hosts array
+        3. Extract hosts from normalized title
+            - Find other orgs not in brackets in the normalized title
+            - Add those orgs to the hosts array
+    - If DATA is the only org in hosts array
+        - THEN set isCrosspost = false
+        - set canonSourceId = this.canonSourceId
+    - Set the lastModified date
+        - Find old version of this event in "Scraped Calendar" using the internal ID as index
+        - IF found old version of this event in "Scraped Calendar"
+            - THEN IF lastModified === null (because source did not provide a last modified date)
+                - THEN get content hash of current and old versions to detect difference
+                - IF no difference between two versions
+                    - THEN set lastModified date equal to the old version's last modified date
+                - ELSE there is a difference
+                    - THEN set lastModified date equal to now
+                    - Overwrite old version in scraped calendar
+            - ELSE IF old version lastModified date is more recent than current version
+                - THEN replace current version with old version
+            - ELSE current version is newer
+                - THEN override old version with current verson
+        - ELSE no old version of this event
+            - Insert current version into Scraped Calendar
+
+
+3. Add each event to the "Staging Calendar". For each event...
+    - Find siblings already staged (events with any matching identifier or reference)
+    - Among siblings, find the canonEvent
+        - IF one of the siblings has a canonSourceId
+            1. Consolidate details
+                - Copy that canonSourceId to all sibling events
+                - FOR EACH siblings AS sibling
+                    - sibling.addSibling(siblings)
+                    - sibling.canonSourceId = canon.sourceId
+                    - sibling.overwriteDetailsFrom(canon)
+                    - canon.fillDetailsFrom(sibling)
+                    - sibling.updateScrapedCalendar()
+            2. Unstage non-canon sibling events
+            3. Remove all siblings from "Missing Canon" array
+        - ELSE if canon event not found yet
+            1. Consolidate details
+                - FOR EACH siblings AS sibling
+                    - sibling.addSibling(siblings)
+                    - sibling.crossfillWith(latestSibling)
+                    - sibling.updateScrapedCalendar()
+
+4. Loop through "Missing Canon" array
+    1. Determine canon event
+    - IF siblings.length === 1
+        canon = siblings[0]
+
+    - ELSE IF siblingsWithOneHost.length === 1
+        canon = siblingsWithOneHost[0]
+
+    - ELSE IF siblingsWithNoTitleHost.length === 1
+        canon = siblingsWithNoTitleHost[0]
+
+    - ELSE IF siblingsSourcedFromTitleHost.length > 0
+        IF siblingsSourcedFromTitleHost.length === 1
+            canon = siblingsSourcedFromTitleHost[0]
+        ELSE siblingsSourcedFromTitleHost.length > 1
+            canon = findCreatedFirst(siblingsSourcedFromTitleHost)
+
+    - ELSE IF siblingsSourcedFromHost.length > 0
+        IF siblingsSourcedFromHost.length === 1
+            canon = siblingsSourcedFromHost[0]
+        ELSE siblingsSourcedFromHost.length > 1
+            canon = findCreatedFirst(siblingsSourcedFromHost)
+
+    - ELSE
+        // all events are sourced from non-hosts
+        // i.e. another event aggregator like VisitDallas, Do214, or Reddit
+        // so just go with the oldest one
+        canon = findCreatedFirst(siblingsSourcedFromHost)
+    
+    2. canon.canonize(siblings)
+    3. Remove siblings from Missing Canon array
+    4. Unstage all siblings except canon event
+
