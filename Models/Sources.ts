@@ -23,6 +23,11 @@ const sources:source[] = [
     url: "https://dallasbicyclecoalition.org/calendar",
     platform: "dbc website"
   },
+  {
+    org: "Dallas Urbanists STLC",
+    url: "https://www.meetup.com/dallas-urbanists/events/ical/",
+    platform: "icalendar"
+  }
 ];
 
 export class Sources {
