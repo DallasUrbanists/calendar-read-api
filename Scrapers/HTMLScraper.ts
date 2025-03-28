@@ -1,6 +1,6 @@
 import axios from "axios";
 import * as cheerio from "cheerio";
-import { initSavedScrap, SavedScrap, Scrap } from "../Models/Scrap";
+import { Scrap } from "../Models/Scrap";
 
 /**
  * An abstract class representing an HTML scraper that provides functionality
@@ -38,21 +38,3 @@ export abstract class HTMLScraper {
     html: string | cheerio.CheerioAPI
   ): Scrap;
 }
-
-class TestScraper extends HTMLScraper {
-  parseScrapFrom(
-    starter: Scrap,
-    html: string | cheerio.CheerioAPI
-  ): Scrap {
-    return SavedScrap.build();
-  }
-}
-
-async function test() {
-  initSavedScrap();
-
-  const scraper = new TestScraper();
-  scraper.downloadHTML('https://dallasurbanists.com/').then(console.log);
-}
-
-//test();

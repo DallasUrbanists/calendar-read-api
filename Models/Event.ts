@@ -1,53 +1,29 @@
 require("dotenv").config();
-import moment, { isMoment } from "moment";
 import _ from "lodash";
-import { sequelize } from "../Database/sequelize";
-import { eventIsRelevant } from "../Storage/cutoff-for-old-events";
+import moment, { isMoment } from "moment";
 import { DataTypes, Model } from "sequelize";
+import { sequelize } from "../Database/sequelize";
+import { ScrapedEvent, TeamupData } from "../Scrapers/ScraperInterfaces";
+import { DEFAULT_DURATION, HOSTS_LIST_DELIMITER, SIMILARITY_HOUR_THRESHOLD, SIMILARITY_TITLE_THRESHOLD_HIGH, SIMILARITY_TITLE_THRESHOLD_LOW, SIMILARITY_TITLE_THRESHOLD_MID } from "../settings";
 import {
+  eventIsRelevant,
   fuzzyMatch,
-  parseBrackets,
-  removeBrackets,
   getSimilarityPercentage,
-  polyRead,
   isNotBlank,
-  nonorgBrackets
+  nonorgBrackets,
+  parseBrackets,
+  polyRead,
+  removeBrackets
 } from '../utilities';
 import {
-  organizations,
+  adhocOrg,
   findOrganization,
   findOrganizationsInTitle,
-  adhocOrg,
-  Organization
+  Organization,
+  organizations
 } from './Organizations';
-import { ScrapedEvent } from "../Scrapers/ScraperInterfaces";
 import { Scrap } from "./Scrap";
 
-const DEFAULT_DURATION = [1, 'hours']; // This is used when an event does not specify an end date. 
-const DEFAULT_LOCATION = 'Dallas, TX'; // This is used when an event does not specify a location.
-const HOSTS_LIST_DELIMITER = ' + '; // This is used to separate multiple event hosts in a list.
-const SIMILARITY_HOUR_THRESHOLD = 2; // If two events start within threshold, compare title similarity based on lower threshold.
-const SIMILARITY_TITLE_THRESHOLD_HIGH = 0.7; // Used to determine if two events (on the same day) are probably the same.
-const SIMILARITY_TITLE_THRESHOLD_MID = 0.51; // Used to determine if two events (within hours of each other) are probably the same.
-const SIMILARITY_TITLE_THRESHOLD_LOW = 0.20; // Used to determine if two events (at same location) are probably the same.
-
-type DateInput = string | Date | moment.Moment;
-type EventKey = keyof typeof Event;
-export type TeamupData = {
-  subcalendar_ids: string[],
-  start_dt: string,
-  end_dt: string,
-  all_day: boolean,
-  notes: string,
-  remote_id?: number,
-  title: string,
-  location: string,
-  who: string,
-  comments_enabled: boolean,
-  custom?: {
-    link: string | null
-  }
-};
 
 export default class Event extends Model implements ScrapedEvent {
   // IDENTIFIERS

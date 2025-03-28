@@ -1,19 +1,10 @@
 require("dotenv").config();
 
-import Event, { TeamupData, initEventModel, sortByAuthority } from "../Models/Event";
-import { StorageInterface } from "./StorageInterface";
+import Event, { initEventModel, sortByAuthority } from "../Models/Event";
 import { Op } from "sequelize";
 import _ from "lodash";
-import axios from "axios";
-import { polyRead, waitRandomSeconds } from "../utilities";
 
-const HEADERS = {
-  'Content-Type': 'application/json',
-  Accept: 'application/json, text/html',
-  'Teamup-Token': 'fa68b6f0d704a55141e7ba70b0497ddec7852b815ce24df37d8c19482f308f01',
-};
-
-export class StoredCalendar implements StorageInterface {
+export class StoredCalendar {
   // Cached results of groomable() method
   private static groomableEvents: Event[] = [];
 
@@ -112,86 +103,3 @@ export class StoredCalendar implements StorageInterface {
     return groomedEvents;
   }
 }
-
-type teamupRequest = {
-  event: Event,
-  request: {
-    method: 'GET' | 'POST' | 'PUT',
-    url: string,
-    params: any,
-    data: TeamupData,
-    headers: any  
-  }
-};
-
-export const subcalendarIndex = {
-  "Urbanism": "14211126",
-  "Housing": "14211119",
-  "Public Transit": "14216526",
-  "Cycling": "14211118"
-};
-
-async function main(): Promise<void> {
-  // All these events are expected to be in TeamUp
-  const groomedEvents = await StoredCalendar.groom();
-
-  // Of those events, these events have not been synced with TeamUp
-  const unsyncedEvents = groomedEvents.filter(event => event.teamupId === null);
-
-  // Conversely, these events have been synced with TeamUp
-  // const syncedEvents = groomedEvents.filter(event => event.teamupId !== null);
-
-  // This is the queue of API calls to send to TeamUp
-  const teamupQueue: teamupRequest[] = [];
-
-  // Define the calendar that we are about to add to
-  const teamupMainCalendar = 'ks8fsg4pwt4gy9va6x';
-
-  // For each unsynced event, add a request to create that event in TeamUp
-  unsyncedEvents.forEach((event:Event) => {
-    const subcalendars = event.categories.map(c => polyRead(subcalendarIndex, c));
-    if (subcalendars.length === 0) {
-      console.log(`No subcalendars for ${event.title}. `, event.teamup?.subCalendars);
-      return;
-    }
-    event.teamup = {
-      mainCalendar: teamupMainCalendar,
-      subCalendars: subcalendars
-    };
-    teamupQueue.push({
-      event,
-      request: {
-        method: 'POST',
-        params: {format: 'html'},
-        url: `https://api.teamup.com/${event.teamup?.mainCalendar}/events`,
-        data: event.asTeamupData(),
-        headers: HEADERS  
-      }
-    })
-  });
-
-  // Process each request to TeamUp
-  for (let request of teamupQueue) {
-    try {
-      console.log('POST to subcalendars: ', request.event.teamup?.subCalendars);
-      const { data } = await axios.request(request.request);
-      if (data?.event) {
-        console.log(`POST "${request.event.title}" and got back Teamup ID ${data.event.id}`);
-        request.event.teamupId = data.event.id;
-        request.event.save();
-        await waitRandomSeconds(2, 5);
-      } else {
-        console.log(`Something went wrong with POST "${request.event.title}"`);
-        console.log(data);
-        console.log(request.request);
-        return;
-      }
-    } catch (e:any) {
-      console.error(e.response.data);
-      console.log(request.request);
-      return;
-    }
-  }
-}
-
-main();

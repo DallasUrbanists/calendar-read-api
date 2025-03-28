@@ -7,10 +7,9 @@ import {
   adhocOrg,
   findOrganization,
 } from "../Models/Organizations";
-import { eventIsRelevant } from "../Storage/cutoff-for-old-events";
-import ChannelInterface from "./ChannelInterface";
+import { eventIsRelevant } from "../utilities";
 
-export class ICalendar implements ChannelInterface {
+export class ICalendar {
   public icsURL: string;
   public sourceOrg: Organization;
 

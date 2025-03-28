@@ -1,12 +1,12 @@
 import { HTMLScraper } from "./HTMLScraper";
-import { TwoStepScraper, ScrapedEvent, StoppedByCaptcha } from "./ScraperInterfaces";
+import { TwoStepScraper, StoppedByCaptcha } from "./ScraperInterfaces";
 import { initSavedScrap, SavedScrap, Scrap } from "../Models/Scrap";
 import * as cheerio from "cheerio";
-import parseMomentFromString from "../parseMomentFromString";
+import parseMomentFromString from "../utilities";
 import Event, { initEventModel } from "../Models/Event";
 import { Op } from "sequelize";
 import moment from "moment";
-import { isNotBlank, waitRandomSeconds } from "../utilities";
+import { waitRandomSeconds } from "../utilities";
 
 const DOMAIN = "https://actionnetwork.org";
 
@@ -63,11 +63,21 @@ export class ActionNetworkScraper
       .map(extractEventHTML)
       .map(buildScrapFromEventHTML);
 
+    const newScraps = [];
     for (let scrap of scraps) {
-      await scrap.save();
+      // check whether we've already captured this scrap before
+      const storedScrap = await SavedScrap.findAndCountAll(
+        { where: { sourceId: scrap.sourceId } }
+      );
+
+      // Only save new scrap if it's totally new
+      if (storedScrap.count === 0) {
+        await scrap.save();
+        newScraps.push(scrap);
+      }
     }
 
-    return scraps;
+    return newScraps;
   }
 
   /**
@@ -203,21 +213,3 @@ export class ActionNetworkScraper
     return savedEvents;
   }
 }
-
-async function test() {
-  const scraper = new ActionNetworkScraper(
-    "Dallas Neighbors for Housing",
-    "https://actionnetwork.org/groups/dallas-neighbors-for-housing"
-  );
-  await scraper.scrape(100);
-
-
-  const readyScraps = await scraper.getReadyScraps();
-  const scrapedEvents = await scraper.convertScrapsToEvents(readyScraps);
-  console.log(scrapedEvents.map(event => ({
-    title: event.title,
-    start: event.start.format('YYYY-MM-DD HH:mm')
-  })));
-}
-
-test();

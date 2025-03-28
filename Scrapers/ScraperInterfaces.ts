@@ -1,4 +1,5 @@
 import { SavedScrap, Scrap } from "../Models/Scrap";
+import Event from "../Models/Event";
 
 /**
  * Scrapers are responsible for downloading raw data ("scraps") from a source,
@@ -119,3 +120,29 @@ export interface ScrapedEvent {
 export interface Page {}
 
 export class StoppedByCaptcha extends Error { }
+export type teamupRequest = {
+  event: Event;
+  request: {
+    method: 'GET' | 'POST' | 'PUT';
+    url: string;
+    params: any;
+    data: TeamupData;
+    headers: any;
+  };
+};
+export type TeamupData = {
+  subcalendar_ids: string[];
+  start_dt: string;
+  end_dt: string;
+  all_day: boolean;
+  notes: string;
+  remote_id?: number;
+  title: string;
+  location: string;
+  who: string;
+  comments_enabled: boolean;
+  custom?: {
+    link: string | null;
+  };
+};
+
