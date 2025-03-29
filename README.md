@@ -34,7 +34,7 @@ Email calendar@dallasurbanists.com or open an issue on GitHub.
 Yes! Submit this form, and we’ll review your request.
 
 - ***Some of our events shouldn’t appear on the community calendar. How do we exclude them?***  
-Simply add [NO SYNC] anywhere in the event description, and the system will ignore it.
+Simply add `[NO SYNC]` anywhere in the event description, and the system will ignore it.
 
 - ***Can we request an event be removed from the community calendar?***  
 Yes! Email calendar@dallasurbanists.com or open an issue on GitHub.
