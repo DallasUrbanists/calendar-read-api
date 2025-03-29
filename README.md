@@ -15,7 +15,7 @@ Every two hours, the web service scrapes events from the public calendars of the
 
 ## Questions & Answers
 
-- ***How can my organization add its events to the community calendar?***  
+- ***How can my organization become a source for the community calendar?***  
 Fill out this application form, and we’ll review your request!
 
 - ***Once my organization is added, do we need to do anything differently?***  
