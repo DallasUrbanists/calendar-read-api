@@ -1,7 +1,7 @@
 import _ from "lodash";
 import moment from "moment";
 import { MAX_DAYS_IN_PAST } from "./settings";
-import Event from "./Models/Event";
+import Event from "./models/Event";
 
 export const ignorableBrackets = [
   '[CANCELED]',

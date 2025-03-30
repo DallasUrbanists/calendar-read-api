@@ -1,7 +1,7 @@
 require("dotenv").config();
 import axios from "axios";
-import Event from "../Models/Event";
-import { teamupRequest } from "../Scrapers/ScraperInterfaces";
+import Event from "../models/Event";
+import { teamupRequest } from "../scrapers/ScraperInterfaces";
 import {
   subcalendarIndex,
   TEAMUP_API_HEADERS,

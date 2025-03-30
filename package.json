@@ -6,7 +6,6 @@
     "build": "tsc",
     "start": "nodemon --watch ./ --ext ts --exec ts-node ./index.ts",
     "test": "echo \"Error: no test specified\" && exit 1",
-
     "action-network-download-lists": "ts-node ./Operations/action-network-download-lists.ts",
     "action-network-download-scraps": "ts-node ./Operations/action-network-download-scraps.ts",
     "action-network-capture-events": "ts-node ./Operations/action-network-capture-events.ts",
@@ -40,6 +39,7 @@
     "@types/lodash": "^4.17.16",
     "@types/node": "^22.13.10",
     "@types/pg": "^8.11.11",
+    "sequelize-cli": "^6.6.2",
     "ts-node": "^10.9.2",
     "typescript": "^5.8.2"
   }

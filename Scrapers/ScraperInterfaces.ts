@@ -1,5 +1,5 @@
-import { SavedScrap, Scrap } from "../Models/Scrap";
-import Event from "../Models/Event";
+import { SavedScrap, Scrap } from "../models/Scrap";
+import Event from "../models/Event";
 
 /**
  * Scrapers are responsible for downloading raw data ("scraps") from a source,

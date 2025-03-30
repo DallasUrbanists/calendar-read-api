@@ -1,5 +1,5 @@
-import { ICalendar } from "../Scrapers/ICalendar";
-import { Sources } from "../Models/Sources";
+import { ICalendar } from "../scrapers/ICalendar";
+import { Sources } from "../models/Sources";
 
 async function main() {
   for (let source of Sources.byPlatform('icalendar')) {

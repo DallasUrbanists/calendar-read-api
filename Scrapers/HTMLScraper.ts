@@ -1,6 +1,6 @@
 import axios from "axios";
 import * as cheerio from "cheerio";
-import { Scrap } from "../Models/Scrap";
+import { Scrap } from "../models/Scrap";
 
 /**
  * An abstract class representing an HTML scraper that provides functionality

@@ -2,8 +2,8 @@ require("dotenv").config();
 import _ from "lodash";
 import moment, { isMoment } from "moment";
 import { DataTypes, Model } from "sequelize";
-import { sequelize } from "../Database/sequelize";
-import { ScrapedEvent, TeamupData } from "../Scrapers/ScraperInterfaces";
+import { sequelize } from "../database/sequelize";
+import { ScrapedEvent, TeamupData } from "../scrapers/ScraperInterfaces";
 import { DEFAULT_DURATION, HOSTS_LIST_DELIMITER, SIMILARITY_HOUR_THRESHOLD, SIMILARITY_TITLE_THRESHOLD_HIGH, SIMILARITY_TITLE_THRESHOLD_LOW, SIMILARITY_TITLE_THRESHOLD_MID } from "../settings";
 import {
   eventIsRelevant,
@@ -20,7 +20,7 @@ import {
   findOrganization,
   findOrganizationsInTitle,
   Organization,
-  organizations
+  orgs
 } from './Organizations';
 import { Scrap } from "./Scrap";
 
@@ -47,10 +47,8 @@ export default class Event extends Model implements ScrapedEvent {
   declare sourceOrg: string; // The name of the organization from whom we pulled this event
   // TEAMUP DETAILS
   declare teamup?: {
-    id?: string, // This is just serves as a shortcut / pass-through to this.teamupId
     mainCalendar?: string,
-    subCalendars: string[],
-    endpoint?: string, // Endpoint for fetching this event from TeamUp API
+    subCalendars: string[]
   };
   // REFERENCES
   declare canonSourceId?: string; // Points to the canonical event. Points to self if this is the canonical event. Null if canon unknown.
@@ -100,7 +98,7 @@ export default class Event extends Model implements ScrapedEvent {
     // In the hosts array, replace aliases and misspellings with the org's official name
     this.hosts = this.hosts
       .map(host => {
-        const match = organizations.find(org => 
+        const match = orgs.find(org => 
           fuzzyMatch(org.name, host) ||
           org.aliases.some(alias => fuzzyMatch(alias, host))
         );
@@ -423,6 +421,7 @@ export const initEventModel = () => {
         type: DataTypes.INTEGER,
         autoIncrement: true,
         primaryKey: true,
+        unique: true,
         get(): number {
           return this.getDataValue('id') ? this.getDataValue('id') : 0;
         }
@@ -538,10 +537,8 @@ export const initEventModel = () => {
       teamup: {
         type: DataTypes.JSONB,
         defaultValue: {
-          id: '',
           mainCalendar: '',
-          subCalendars: [],
-          endpoint: ''
+          subCalendars: []
         }
       },
       canonSourceId: {
@@ -609,15 +606,4 @@ export function higherAuthority(a:Event, b:Event): number {
  */
 export function sortByAuthority(events:Event[]): Event[] {
   return events.sort(higherAuthority);
-}
-
-function test() {
-  initEventModel();
-  const ev = Event.build({
-    title: '[DATA][DBC] Sample Event',
-    sourceOrg: 'Dallas Area Transit Alliance',
-    hosts: ['DUSTLC']
-  });
-  ev.normalize();
-  console.log(ev.hosts);
 }

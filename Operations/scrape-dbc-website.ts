@@ -1,4 +1,4 @@
-import { DBCWebsiteScraper } from "../Scrapers/DBCWebsiteScraper";
+import { DBCWebsiteScraper } from "../scrapers/DBCWebsiteScraper";
 
 const sourceOrg = 'Dallas Bicycle Coalition';
 const sourceURL = 'https://dallasbicyclecoalition.org/calendar';

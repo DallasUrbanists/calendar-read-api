@@ -1,9 +1,9 @@
 import { HTMLScraper } from "./HTMLScraper";
 import { TwoStepScraper, StoppedByCaptcha } from "./ScraperInterfaces";
-import { initSavedScrap, SavedScrap, Scrap } from "../Models/Scrap";
+import { initSavedScrap, SavedScrap, Scrap } from "../models/Scrap";
 import * as cheerio from "cheerio";
 import parseMomentFromString from "../utilities";
-import Event, { initEventModel } from "../Models/Event";
+import Event, { initEventModel } from "../models/Event";
 import { Op } from "sequelize";
 import moment from "moment";
 import { waitRandomSeconds } from "../utilities";

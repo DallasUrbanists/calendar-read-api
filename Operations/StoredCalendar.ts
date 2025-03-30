@@ -1,6 +1,6 @@
 require("dotenv").config();
 
-import Event, { initEventModel, sortByAuthority } from "../Models/Event";
+import Event, { initEventModel, sortByAuthority } from "../models/Event";
 import { Op } from "sequelize";
 import _ from "lodash";
 

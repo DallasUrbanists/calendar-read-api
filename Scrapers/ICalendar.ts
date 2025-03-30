@@ -1,12 +1,12 @@
 import axios from "axios";
 import * as ical from "ical";
 import moment from "moment";
-import Event, { initEventModel } from "../Models/Event";
+import Event, { initEventModel } from "../models/Event";
 import {
   Organization,
   adhocOrg,
   findOrganization,
-} from "../Models/Organizations";
+} from "../models/Organizations";
 import { eventIsRelevant } from "../utilities";
 
 export class ICalendar {

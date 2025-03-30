@@ -1,7 +1,7 @@
 import axios from "axios";
 import * as cheerio from "cheerio";
 import moment from "moment";
-import Event, { initEventModel } from "../Models/Event";
+import Event, { initEventModel } from "../models/Event";
 import { cleanAndParseJSON, eventIsRelevant } from "../utilities";
 
 export class DBCWebsiteScraper {

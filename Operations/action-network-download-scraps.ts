@@ -1,5 +1,5 @@
-import { ActionNetworkScraper } from "../Scrapers/ActionNetworkScraper";
-import { Sources } from "../Models/Sources";
+import { ActionNetworkScraper } from "../scrapers/ActionNetworkScraper";
+import { Sources } from "../models/Sources";
 
 async function main() {
   for (let source of Sources.byPlatform('action network')) {

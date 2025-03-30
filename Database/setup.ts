@@ -1,20 +1,41 @@
 require("dotenv").config();
-import { sequelize } from '../Database/sequelize';
-import { initEventModel } from '../Models/Event';
-import { initSavedScrap } from '../Models/Scrap';
+import { sequelize } from "./sequelize";
+import Event, { initEventModel } from "../models/Event";
+import { SavedScrap, initSavedScrap } from "../models/Scrap";
+
+const exportData = require("./export.json");
 
 initEventModel();
 initSavedScrap();
 
-(async () => {
-  try {
-    await sequelize.authenticate();
-    console.log('Database connection established successfully.');
+const sync = new Map();
 
-    // Sync the model with the database
-    await sequelize.sync({ alter: true }); // Use `alter: true` to update the schema without dropping data
-    console.log('Event model synchronized with the database.');
-  } catch (error) {
-    console.error('Unable to connect to the database:', error);
+// ADD A LINE FOR EACH MODEL TO BE SYNCED
+sync.set("events", Event);
+sync.set("scraps", SavedScrap);
+
+async function main() {
+  await sequelize.authenticate();
+
+  // Sync database structure
+  await sequelize.sync({ force: true });
+
+  for (let [key, m] of sync) {
+    const data = exportData[key];
+
+    // Extract the Event IDs stored in the database
+    const storedIds = (await m.findAll({ attributes: ["id"] })).map(
+      (e: entity) => e.id
+    );
+    const imports = data.filter((d: any) => !storedIds.includes(d.id));
+
+    console.log(`Importing ${imports.length} ${key}`);
+
+    // Import events to database
+    await m.bulkCreate(imports);
   }
-})();
+}
+
+type entity = { id: number; };
+
+main();

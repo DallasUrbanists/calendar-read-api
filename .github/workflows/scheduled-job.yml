@@ -2,8 +2,8 @@ name: Hourly Scheduled Job
 
 on:
   schedule:
-    - cron: "33 6-20 * * *"  # Runs once per hour from 6 AM to 8 PM
-  workflow_dispatch:  # Allows manual triggering
+    - cron: "33 6-20 * * *" # Runs once per hour from 6 AM to 8 PM
+  workflow_dispatch: # Allows manual triggering
 
 jobs:
   run_script:

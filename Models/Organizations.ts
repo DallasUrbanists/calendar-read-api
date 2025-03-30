@@ -10,7 +10,7 @@ export function adhocOrg(name: string): Organization {
   return { name, aliases: [], categories: [] };
 }
 
-export const organizations: Organization[] = [
+export const orgs: Organization[] = [
   {
     name: "Dallas Urbanists STLC",
     aliases: [
@@ -105,7 +105,7 @@ export const organizations: Organization[] = [
 ];
 
 export function findOrganizationsInTitle(title: string): Organization[] {
-  return organizations
+  return orgs
     // Compare all organizations against the title
     .map(org => {
       // Look for org name and track it's position in title
@@ -132,5 +132,5 @@ export function findOrganizationsInTitle(title: string): Organization[] {
 export function findOrganization(name: string): Organization|null {
   const matchingName = (o:Organization): boolean => fuzzyMatch(o.name, name);
   const matchingAlias = (o:Organization): boolean => o.aliases.some(alias => fuzzyMatch(alias, name));
-  return organizations.find((o:Organization)=> matchingName(o)||matchingAlias(o)) ?? null;
+  return orgs.find((o:Organization)=> matchingName(o)||matchingAlias(o)) ?? null;
 }

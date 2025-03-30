@@ -1,9 +1,8 @@
 import { DataTypes, Model } from "sequelize";
-import { ScrapedEvent } from "../Scrapers/ScraperInterfaces";
+import { ScrapedEvent } from "../scrapers/ScraperInterfaces";
 import Event from "./Event";
-import { sequelize } from "../Database/sequelize";
+import { sequelize } from "../database/sequelize";
 import moment from "moment";
-import { mapToObject, objectToMap } from "../utilities";
 
 /**
  * Scraps are raw data downloaded from a source.
@@ -69,54 +68,61 @@ export class SavedScrap extends Model implements Scrap {
   }
 }
 
-export const initSavedScrap = () => SavedScrap.init(
-  {
-    eventTitle: { type: DataTypes.STRING, allowNull: false },
-    sourceId: { type: DataTypes.STRING, allowNull: false },
-    sourceOrg: { type: DataTypes.STRING, allowNull: false },
-    data: {
-      type: DataTypes.JSONB,
-      allowNull: true,
-      set(value: Map<string, any>) {
-        this.setDataValue('data', mapToObject(value));
+export const initSavedScrap = () =>
+  SavedScrap.init(
+    {
+      eventTitle: { type: DataTypes.STRING, allowNull: false },
+      sourceId: { type: DataTypes.STRING, allowNull: false },
+      sourceOrg: { type: DataTypes.STRING, allowNull: false },
+      data: {
+        type: DataTypes.JSONB,
+        allowNull: true,
+        set(value: Map<string, any> | null) {
+          this.setDataValue(
+            "data",
+            value instanceof Map ? Object.fromEntries(value) : null
+          );
+        },
+        get() {
+          const value = this.getDataValue("data");
+          return value === null ? null : new Map(Object.entries(value));
+        },
       },
-      get() {
-        const value = this.getDataValue('data');
-        if (value === null) return null;
-        return objectToMap(value);
-      }
+      saveDate: {
+        type: DataTypes.DATE,
+        defaultValue: moment().format(),
+        set(value: moment.Moment | Date | string) {
+          this.setDataValue("saveDate", moment(value).format());
+        },
+        get() {
+          return moment(this.getDataValue("saveDate"));
+        },
+      },
+      lastScrape: {
+        type: DataTypes.DATE,
+        allowNull: true,
+        defaultValue: null,
+        set(value: moment.Moment | Date | string | null) {
+          if (value !== null) {
+            this.setDataValue("lastScrape", moment(value).format());
+            if (!this.getDataValue("saveDate")) {
+              this.setDataValue("saveDate", moment(value).format());
+            }
+          } else {
+            this.setDataValue("lastScrape", null);
+          }
+        },
+        get() {
+          return this.getDataValue("lastScrape")
+            ? moment(this.getDataValue("lastScrape"))
+            : null;
+        },
+      },
     },
-    saveDate: {
-      type: DataTypes.DATE,
-      defaultValue: moment().format(),
-      set(value: moment.Moment | Date | string) {
-        this.setDataValue('saveDate', moment(value).format());
-      },
-      get() {
-        return moment(this.getDataValue('saveDate'));
-      }
-    },
-    lastScrape: {
-      type: DataTypes.DATE,
-      allowNull: true,
-      defaultValue: null,
-      set(value: moment.Moment | Date | string) {
-        this.setDataValue('lastScrape', moment(value).format());
-        if (!this.getDataValue('saveDate')) {
-          this.setDataValue('saveDate', moment(value).format());
-        }
-      },
-      get() {
-        return this.getDataValue('lastScrape')
-          ? moment(this.getDataValue('lastScrape'))
-          : null;
-      }
+    {
+      sequelize,
+      modelName: "SavedScrap",
+      tableName: "scraps",
+      timestamps: false, // Disable Sequelize's automatic `createdAt` and `updatedAt` fields
     }
-  },
-  {
-    sequelize,
-    modelName: "SavedScrap",
-    tableName: "scraps",
-    timestamps: false, // Disable Sequelize's automatic `createdAt` and `updatedAt` fields
-  }
-);
+  );
