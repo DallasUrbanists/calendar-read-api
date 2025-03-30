@@ -6,7 +6,13 @@
     "build": "tsc",
     "start": "nodemon --watch ./ --ext ts --exec ts-node ./index.ts",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dn4h-sync": "run-func dn4h.js main"
+
+    "action-network-download-lists": "ts-node ./Operations/action-network-download-lists.ts",
+    "action-network-download-scraps": "ts-node ./Operations/action-network-download-scraps.ts",
+    "action-network-capture-events": "ts-node ./Operations/action-network-capture-events.ts",
+    "scrape-dbc-website": "ts-node ./Operations/scrape-dbc-website.ts",
+    "scrape-icalendar-sources": "ts-node ./Operations/scrape-icalendar-sources.ts",
+    "sync-with-teamup": "ts-node ./Operations/sync-with-teamup.ts"
   },
   "keywords": [],
   "author": "",
