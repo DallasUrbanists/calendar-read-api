@@ -1,11 +1,11 @@
 # 🗓️ Dallas Urbanists Community Calendar
 
-This project is a web service that scrapes events from multiple online calendars and combines them into [one community calendar](https://teamup.com/kszuqubx7tt8w4j8j3) hosted on TeamUp.com.
+This project is a web service that scrapes events from multiple online calendars and combines them into [one community calendar](https://teamup.com/kszuqubx7tt8w4j8j3).
+
+> [!TIP]
+> Here is the public link to the community calendar! You are welcome to share and redistribute this link on your website, emails, and social media: 🔗[**https://teamup.com/kszuqubx7tt8w4j8j3**](https://teamup.com/kszuqubx7tt8w4j8j3)
 
 ![image](https://github.com/user-attachments/assets/708b1fd7-ae48-4d2f-8a1a-6243a07c1c51)
-
-> [!NOTE]
-> Here is the public link to the community calendar! You are welcome to share and redistribute this link on your website, emails, and social media: 🔗[**https://teamup.com/kszuqubx7tt8w4j8j3**](https://teamup.com/kszuqubx7tt8w4j8j3)
 
 ## Source Organizations
 
