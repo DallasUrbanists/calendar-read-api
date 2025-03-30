@@ -11,10 +11,10 @@ This project is a web service that scrapes events from multiple online calendars
 
 Every two hours during the daytime, the web service scrapes events from the public calendars of the organizations below. [More orgs](https://github.com/DallasUrbanists/calendar-read-api/issues/1) coming soon! If you notice an error on the community calendar, please email calendar@dallasurbanists.com.
 
-- [Dallas Urbanists STLC](https://www.meetup.com/dallas-urbanists-stlc/events/)
-- [DATA (Dallas Area Transit Alliance)](https://dallasareatransitalliance.org/calendar)
-- [Dallas Bicycle Coalition](https://dallasbicyclecoalition.org/calendar/)
-- [Dallas Neighbors for Housing](https://actionnetwork.org/groups/dallas-neighbors-for-housing)
+- **Dallas Urbanists STLC** — via [Meetup.com](https://www.meetup.com/dallas-urbanists-stlc/events/)
+- **DATA / Dallas Area Transit Alliance** — via [Google Calendar](https://dallasareatransitalliance.org/calendar)
+- **Dallas Bicycle Coalition** — via their [website](https://dallasbicyclecoalition.org/calendar/)
+- **Dallas Neighbors for Housing** — via [Action Network](https://actionnetwork.org/groups/dallas-neighbors-for-housing)
 
 To request adding your organization as a source for the community calendar, [submit this online form](https://forms.gle/6KLcsuau4ncZcocn9). You can also [request individual events](https://forms.gle/D7r5FWhG2fFTjPJK8) be added to the community calendar.
 
@@ -57,6 +57,10 @@ To embed a specific subcalendar, open the [TeamUp Embed Tool](https://teamup.com
 - Cycling: 🔗 https://teamup.com/ksx2smu7tokivw5ifo
 - Mobility (Public Transit + Cycling): 🔗 https://teamup.com/kspuvu3mhinhbtagjw
 - Housing: 🔗 https://teamup.com/kshpcmnsqe9bqsu49c
+
+> [!WARNING]
+> If we collect events automatically from your website calendar (like Dallas Bicycle Coalition's), please contact Hexel before switching to the embedded community calendar. Our automatic collection system needs your events to appear consistently on your website. Any changes to your calendar page might prevent us from finding your events.
+
 
 ## Questions & Answers
 
