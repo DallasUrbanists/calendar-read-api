@@ -1,7 +1,7 @@
 {
   "name": "calendar-read-api",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "./dist/index.js",
   "scripts": {
     "build": "tsc",
     "start": "nodemon --watch ./ --ext ts --exec ts-node ./index.ts",

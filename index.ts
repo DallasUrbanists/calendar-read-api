@@ -14,8 +14,8 @@ app.get("/", (req: Request, res: Response) => {
     message: "QUACK HONK! You found my calendar event scraper. I built this to keep the Dallas Urbanists Community Calendar updated automatically. Every few hours, a script grabs events from local organizations and adds them to the calendar.",
     links: [
       {
-        label: "Dallas Urbanists Community Calendar on Teamup",
-        url: "https://teamup.com/kszxfmof4iyibgp1kn",
+        label: "Dallas Urbanists Community Calendar",
+        url: "https://teamup.com/kszuqubx7tt8w4j8j3",
       },
       {
         label: "Github",
