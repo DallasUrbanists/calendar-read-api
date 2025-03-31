@@ -18,14 +18,14 @@ async function main() {
   await sequelize.authenticate();
 
   // Sync database structure
-  await sequelize.sync({ force: true });
+  await sequelize.sync({ alter: true });
 
   for (let [key, m] of sync) {
     const data = exportData[key];
 
     // Extract the Event IDs stored in the database
     const storedIds = (await m.findAll({ attributes: ["id"] })).map(
-      (e: entity) => e.id
+      (e: { id: number; }) => e.id
     );
     const imports = data.filter((d: any) => !storedIds.includes(d.id));
 
@@ -35,7 +35,5 @@ async function main() {
     await m.bulkCreate(imports);
   }
 }
-
-type entity = { id: number; };
 
 main();

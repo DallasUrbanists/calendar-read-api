@@ -1,8 +1,8 @@
-name: Hourly Scheduled Job
+name: Execute Step 1 of Two-Step Operations
 
 on:
   schedule:
-    - cron: "33 6-20 * * *" # Runs once per hour from 6 AM to 8 PM
+    - cron: "10 6-22 * * *" # Every hour from 6:10 AM to 10:10 PM
   workflow_dispatch: # Allows manual triggering
 
 jobs:
@@ -21,5 +21,5 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      - name: "Run the scheduled script: sync DN4H calendar"
-        run: npm run dn4h-sync
+      - name: Download lists from Action Network
+        run: npm run action-network-download-lists

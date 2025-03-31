@@ -1,0 +1,31 @@
+name: Execute One-Step Scrape Operations
+
+on:
+  schedule:
+    - cron: "1,31 6-22 * * *" # Every 30 minutes from 6:01 AM to 10:31 PM
+  workflow_dispatch: # Allows manual triggering
+
+jobs:
+  run_script:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "18"
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Scrape from iCalendar sources
+        run: npm run scrape-icalendar-sources
+
+      - name: Scrape from Dallas Bicycle Coalition website
+        run: npm run scrape-dbc-website
+
+      - name: Convert Action Network scraps to events
+        run: npm run action-network-capture-events

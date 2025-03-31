@@ -3,15 +3,15 @@
   "version": "1.0.0",
   "main": "./dist/index.js",
   "scripts": {
-    "build": "tsc",
+    "build": "tsc && ts-node ./database/setup.ts",
     "start": "nodemon --watch ./ --ext ts --exec ts-node ./index.ts",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "action-network-download-lists": "ts-node ./Operations/action-network-download-lists.ts",
-    "action-network-download-scraps": "ts-node ./Operations/action-network-download-scraps.ts",
-    "action-network-capture-events": "ts-node ./Operations/action-network-capture-events.ts",
-    "scrape-dbc-website": "ts-node ./Operations/scrape-dbc-website.ts",
-    "scrape-icalendar-sources": "ts-node ./Operations/scrape-icalendar-sources.ts",
-    "sync-with-teamup": "ts-node ./Operations/sync-with-teamup.ts"
+    "action-network-download-lists": "ts-node ./operations/action-network-download-lists.ts",
+    "action-network-download-scraps": "ts-node ./operations/action-network-download-scraps.ts",
+    "action-network-capture-events": "ts-node ./operations/action-network-capture-events.ts",
+    "scrape-dbc-website": "ts-node ./operations/scrape-dbc-website.ts",
+    "scrape-icalendar-sources": "ts-node ./operations/scrape-icalendar-sources.ts",
+    "sync-with-teamup": "ts-node ./operations/sync-with-teamup.ts"
   },
   "keywords": [],
   "author": "",
