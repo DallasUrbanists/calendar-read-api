@@ -34,7 +34,25 @@ export class DBCWebsiteScraper {
   }
 
   async loadWebpage(): Promise<any> {
-    const response = await axios.get(this.sourceURL);
+    const response = await axios.get(this.sourceURL, {
+      headers: {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:136.0) Gecko/20100101 Firefox/136.0",
+        "Referer": "https://dallasurbanists.com",
+        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+        "Accept-Language": "en-US,en;q=0.5",
+        "Accept-Encoding": "gzip, deflate, br, zstd",
+        "Connection": "close",
+        "Upgrade-Insecure-Requests": 1,
+        "Sec-Fetch-Dest": "document",
+        "Sec-Fetch-Mode": "navigate",
+        "Sec-Fetch-Site": "none",
+        "Sec-Fetch-User": "?1",
+        "DNT": 1,
+        "Sec-GPC": 1,
+        "Priority": "u=0, i"
+      }
+    });
+    console.log(response.data);
     return response.data;
   }
 
