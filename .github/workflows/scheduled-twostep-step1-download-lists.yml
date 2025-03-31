@@ -23,3 +23,5 @@ jobs:
 
       - name: Download lists from Action Network
         run: npm run action-network-download-lists
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}

@@ -23,3 +23,5 @@ jobs:
 
       - name: Download scraps from Action Network
         run: npm run action-network-download-scraps
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}

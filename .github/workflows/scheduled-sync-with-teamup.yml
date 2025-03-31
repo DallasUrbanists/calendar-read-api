@@ -23,3 +23,5 @@ jobs:
 
       - name: Sync events with Teamup
         run: npm run sync-with-teamup
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
