@@ -27,10 +27,10 @@ jobs:
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
 
-      - name: Scrape from Dallas Bicycle Coalition website
-        run: npm run scrape-dbc-website
-        env:
-          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+      #- name: Scrape from Dallas Bicycle Coalition website
+      #  run: npm run scrape-dbc-website
+      #  env:
+      #    DATABASE_URL: ${{ secrets.DATABASE_URL }}
 
       - name: Convert Action Network scraps to events
         run: npm run action-network-capture-events
