@@ -63,7 +63,7 @@ async function main() {
         );
         request.event.teamupId = data.event.id;
         request.event.save();
-        await waitRandomSeconds(2, 5);
+        await waitRandomSeconds(1, 2);
       } else {
         console.log(`Something went wrong with POST "${request.event.title}"`);
         return;

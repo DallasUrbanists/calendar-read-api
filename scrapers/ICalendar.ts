@@ -20,7 +20,6 @@ export class ICalendar {
   }
 
   async getEventsFromStore(): Promise<Event[]> {
-    console.log("Getting events stored in the database");
     return await Event.findAll({
       where: {
         sourceOrg: this.sourceOrg.name,
@@ -31,9 +30,7 @@ export class ICalendar {
   /**
    * Update database of events by insert new events and updating existing ones.
    */
-  async updateDatabase(): Promise<void> {
-    console.log("Updating events in database");
-
+  async updateDatabase(): Promise<Event[]> {
     // Array of events from source
     const fetchedEvents: Event[] = await this.fetchEventsFromSource();
 
@@ -47,12 +44,17 @@ export class ICalendar {
             fetchedEvent.save();
             // Otherwise, update the existing stored event with data in new event
           } else {
+            const lastModified = fetchedEvent.lastModified;
             storedEvent.updateFrom(fetchedEvent);
+            // We should always respect the last modified date according to source
+            storedEvent.lastModified = lastModified;
             storedEvent.save();
           }
         }
       );
     });
+
+    return fetchedEvents;
   }
 
   /**
@@ -60,8 +62,6 @@ export class ICalendar {
    * filter out ignorable events (e.g. events tagged [IGNORE] in title or description)
    */
   async fetchEventsFromSource(): Promise<Event[]> {
-    console.log("Fetching events from source");
-
     return (await this.fetchEventsFromICS())
       .map((event) => event.normalize())
       .filter((event) => !event.isIgnorable());
@@ -71,18 +71,19 @@ export class ICalendar {
    * Fetches an ICS calendar file from a URL and parses it into array of Event objects
    */
   async fetchEventsFromICS(): Promise<Event[]> {
+    console.log(`Fetching events from ICS calendar: ${this.icsURL}`);
     const icsData = (await axios.get(this.icsURL, { responseType: "text" }))
       .data;
     const isParseableEvent = (data: ical.CalendarComponent) =>
-      "VEVENT" === data.type &&
-      "CONFIRMED" === data.status &&
       data.summary &&
       data.start;
 
     try {
-      return Object.values(ical.parseICS(icsData))
-        .filter(isParseableEvent)
-        .map(this.parseEventFromICS, this);
+      const response = Object.values(ical.parseICS(icsData));
+      console.log("Response included ICS events:", response.length);
+      const parseable = response.filter(isParseableEvent);
+      console.log("Number of parseable ICS events:", parseable.length);
+      return parseable.map(this.parseEventFromICS, this);
     } catch (error) {
       console.error("Error fetching or parsing ICS:", error);
       return [];
@@ -95,6 +96,7 @@ export class ICalendar {
   parseEventFromICS(icsData: ical.CalendarComponent): Event {
     const start = moment(icsData?.start);
     const end = icsData.end ? icsData.end : start.clone().add("1", "h");
+    icsData.lastmodified = icsData.lastmodified ?? icsData.created;
     return Event.build({
       // IDENTIFIERS
       sourceId: icsData.uid,

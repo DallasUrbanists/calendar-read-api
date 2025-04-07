@@ -3,8 +3,11 @@ import * as cheerio from "cheerio";
 import moment from "moment";
 import Event, { initEventModel } from "../models/Event";
 import { cleanAndParseJSON, eventIsRelevant } from "../utilities";
+import _ from "lodash";
 
 export class DBCWebsiteScraper {
+  private static dataKeys: string[] = [];
+
   constructor(public sourceURL: string, public sourceOrg: string) {
     this.sourceURL = sourceURL;
     this.sourceOrg = sourceOrg;
@@ -25,7 +28,10 @@ export class DBCWebsiteScraper {
             fetchedEvent.save();
             // Otherwise, update the existing stored event with data in new event
           } else {
+            const lastModified = fetchedEvent.lastModified;
             storedEvent.updateFrom(fetchedEvent);
+            // We should always respect the last modified date according to source
+            storedEvent.lastModified = lastModified;
             storedEvent.save();
           }
         }

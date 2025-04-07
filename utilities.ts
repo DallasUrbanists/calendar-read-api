@@ -84,6 +84,10 @@ export function getSimilarityPercentage(str1:string , str2:string ): number {
  * @returns {boolean} - True if strings are at least 80% similar; false if less than 80%.
  */
 export function fuzzyMatch(str1: string, str2: string) {
+  if (str1 === str2) return true; // Exact match
+  if (str1 === null || str2 === null) return false; // One is null, no similarity
+  if (!str1.length && !str2.length) return true; // Both strings are empty
+  if (!str1.length || !str2.length) return false; // One is empty, no similarity
   const normalize = (str: string) => _.toUpper(str.trim().replace(/[^a-zA-Z0-9 ]/g, '').replace(/\s+/g, ' '));
   return 0.8 <= getSimilarityPercentage(normalize(str1), normalize(str2));
 }
@@ -116,7 +120,7 @@ export function parseBrackets(inputString: string, orgsOnly: boolean = false): s
   let matches:string[] = inputString.match(/\[([^\]]+)\]/g) ?? [];
   // Remove brackets we know don't represent orgs, like [OFFICIAL]
   if (orgsOnly) {
-    matches = matches.filter(m => nonorgBrackets.includes(m));
+    matches = matches.filter(m => !nonorgBrackets.includes(m));
   }
   // Remove the opening and closing brackets
   return matches.map(match => match.slice(1, -1));

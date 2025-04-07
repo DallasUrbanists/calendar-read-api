@@ -4,7 +4,7 @@ import moment, { isMoment } from "moment";
 import { DataTypes, Model } from "sequelize";
 import { sequelize } from "../database/sequelize";
 import { ScrapedEvent, TeamupData } from "../scrapers/ScraperInterfaces";
-import { DEFAULT_DURATION, HOSTS_LIST_DELIMITER, SIMILARITY_HOUR_THRESHOLD, SIMILARITY_TITLE_THRESHOLD_HIGH, SIMILARITY_TITLE_THRESHOLD_LOW, SIMILARITY_TITLE_THRESHOLD_MID } from "../settings";
+import { DEFAULT_DURATION, HOSTS_LIST_DELIMITER, SIMILARITY_HOUR_THRESHOLD, SIMILARITY_TITLE_THRESHOLD_HIGH, SIMILARITY_TITLE_THRESHOLD_LOW, SIMILARITY_TITLE_THRESHOLD_MID, subcalendarIndex } from "../settings";
 import {
   eventIsRelevant,
   fuzzyMatch,
@@ -64,10 +64,15 @@ export default class Event extends Model implements ScrapedEvent {
   * - If all day, set start time and end time to midnight
   */
   normalize(): this {
+    // Fix corrupted host string
+    if (this.hosts.every(host => host.length < 2)) {
+      this.hosts = [];
+    }
+
     // Sometimes people put the organization name in the event title with square brackets.
     // If they've done so, let's move the organization name from the title to the hosts property
     const titleBrackets = parseBrackets(this.title, true);
-    if (titleBrackets && titleBrackets?.length > 0) {
+    if (titleBrackets.length > 0) {
       // Because we can't enforce a standard practice of one org name per pair of square brackets
       // Detect when multiple org names share a pair of square brackets based on use of special characters
       const titleBracketOrgs = _.flatten(titleBrackets.map(b => b.split(/[;,+&]/).map(s => s.trim()).filter(s => s !== "")));
@@ -158,6 +163,21 @@ export default class Event extends Model implements ScrapedEvent {
     // Set the event category based on the primary host
     if (this.categories.length === 0) {
       this.categories = this.getPrimaryHost().categories;
+    }
+
+    // Set the teamup object if it's not set already
+    if (!this.teamup) {
+      this.teamup = {
+        mainCalendar: process.env.TEAMUP_DALLAS_URBANISTS_COMMUNITY_CALENDAR_MODIFIABLE_ID,
+        subCalendars: [],
+      };
+    }
+
+    // Set the teamup subcalendars based on the event categories
+    if (this.teamup.subCalendars.length === 0 ) {
+      this.teamup.subCalendars = this.categories.map((c) =>
+        polyRead(subcalendarIndex, c)
+      );
     }
     
     // Fix if end is before the start
@@ -327,6 +347,12 @@ export default class Event extends Model implements ScrapedEvent {
      ) {
       return true;
     }
+
+    // If events have exact same sourceOrg, consider them different
+    // because any similarities would be coincidental or deliberate
+    if (this.sourceOrg === other.sourceOrg) {
+      return false;
+    }
     
     // If events don't start on the same day, we won't consider them the same
     if (!this.start?.isSame(other.start, 'day')) {
@@ -392,13 +418,24 @@ export default class Event extends Model implements ScrapedEvent {
     return eventIsRelevant(this);
   }
 
+  isSameContentAs(other: Event): boolean {
+    return (
+      this.title === other.title &&
+      this.start.isSame(other.start) &&
+      this.end.isSame(other.end) &&
+      this.isAllDay === other.isAllDay &&
+      this.location === other.location &&
+      this.description === other.description
+    );
+  }
+
   asTeamupData(): TeamupData {
     return {
       subcalendar_ids: this.teamup?.subCalendars ?? [],
       start_dt: this.start.format(),
       end_dt: this.end.format(),
       all_day: this.isAllDay,
-      notes: this.description,
+      notes: encodeURIComponent(this.description),
       title: this.title,
       location: this.location,
       who: this.hosts.join(' + '),
@@ -512,13 +549,13 @@ export const initEventModel = () => {
         defaultValue: () => moment().format(),
         set(value) {
           const modifiedDate = moment(value ?? null);
-          this.setDataValue('modifiedDate', modifiedDate.format());
+          this.setDataValue('lastModified', modifiedDate.format());
           if (!this.getDataValue('creationDate')) {
             this.setDataValue('creationDate', modifiedDate.format());
           }
         },
         get() {
-          return moment(this.getDataValue('modifiedDate'));
+          return moment(this.getDataValue('lastModified'));
         }
       },
       sourceTitle: {

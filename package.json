@@ -11,7 +11,7 @@
     "action-network-capture-events": "ts-node ./operations/action-network-capture-events.ts",
     "scrape-dbc-website": "ts-node ./operations/scrape-dbc-website.ts",
     "scrape-icalendar-sources": "ts-node ./operations/scrape-icalendar-sources.ts",
-    "sync-with-teamup": "ts-node ./operations/sync-with-teamup.ts"
+    "sync-with-teamup": "ts-node ./operations/sync-with-teamup-v2.ts"
   },
   "keywords": [],
   "author": "",
@@ -31,7 +31,8 @@
     "pg": "^8.14.1",
     "pg-hstore": "^2.3.4",
     "run-func": "^3.0.0",
-    "sequelize": "^6.37.6"
+    "sequelize": "^6.37.6",
+    "tableify": "^1.1.1"
   },
   "devDependencies": {
     "@types/express": "^5.0.0",
@@ -39,6 +40,7 @@
     "@types/lodash": "^4.17.16",
     "@types/node": "^22.13.10",
     "@types/pg": "^8.11.11",
+    "@types/tableify": "^1.1.5",
     "sequelize-cli": "^6.6.2",
     "ts-node": "^10.9.2",
     "typescript": "^5.8.2"
