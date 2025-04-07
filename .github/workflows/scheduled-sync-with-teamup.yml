@@ -26,3 +26,5 @@ jobs:
         run: npm run sync-with-teamup
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          TEAMUP_APIKEY: ${{ secrets.TEAMUP_APIKEY }}
+          TEAMUP_DALLAS_URBANISTS_COMMUNITY_CALENDAR_MODIFIABLE_ID: ${{ secrets.TEAMUP_DALLAS_URBANISTS_COMMUNITY_CALENDAR_MODIFIABLE_ID }}
